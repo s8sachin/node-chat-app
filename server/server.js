@@ -2,24 +2,37 @@ const path = require('path');
 const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
+const cors = require('cors');
 
-const {generateMessage, generateLocationMessage} = require('./utils/message');
+const {generateMessage, generateLocationMessage, generateVideoPartyEvent} = require('./utils/message');
 const {isRealString} = require('./utils/validations');
 const {Users} = require('./utils/users');
 
 const publicPath = path.join(__dirname, '../public');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
+
+const defaultCb = () => {};
 
 var app = express();
 var server = http.createServer(app);
-var io = socketIO(server);
+var io = socketIO(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 var users = new Users();
+
+app.use(cors());
 
 app.use(express.static(publicPath));
 io.on('connection', (socket) => {
   console.log("New user connected");
+  // socket.join('room1')
+  // socket.to('room1').emit('newMessage', generateMessage('Admin', "Welcome to chat app."));
 
-  socket.on('join', (params, callback) => {
+  socket.on('join', (params, callback = defaultCb) => {
+    console.log(params, 'XXX')
     if(!isRealString(params.name) || !isRealString(params.room)){
       return callback('Name and room name are required');
     }
@@ -34,11 +47,20 @@ io.on('connection', (socket) => {
     callback();
   });
 
-  socket.on('createMessage', (message, callback) =>{
+  socket.on('createMessage', (message, callback = defaultCb) =>{
     var user = users.getUser(socket.id);
 
     if (user && isRealString(message.text)){
       io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+    }
+    callback();
+  });
+
+  socket.on('createVideoPartyEvent', (message, callback = defaultCb) =>{
+    var user = users.getUser(socket.id);
+    console.log(message, 'MESSAGE')
+    if (user && message){
+      io.to(user.room).emit('newVideoPartyEvent', generateVideoPartyEvent(user.name, message));
     }
     callback();
   });

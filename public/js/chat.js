@@ -72,11 +72,12 @@ socket.on('newLocationMessage', function(message){
 $('#message-form').on('submit', function(e){
   var messageTextbox = $('[name=message]');
   e.preventDefault();
-  socket.emit('createMessage', {
-    text: messageTextbox.val()
-  }, function(){
-    messageTextbox.val("");
-  });
+  // socket.emit('createMessage', {
+  //   text: messageTextbox.val()
+  // }, function(){
+  //   messageTextbox.val("");
+  // });
+  socket.emit('createVideoPartyEvent', { type: 'action', subType: 'play', value: 35.369209 }, () => {})
 });
 
 var locationButton = $('#send-location');

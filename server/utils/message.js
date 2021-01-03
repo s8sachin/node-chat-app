@@ -8,6 +8,14 @@ var generateMessage = (from, text) => {
   };
 };
 
+var generateVideoPartyEvent = (from, event) => {
+  return {
+    from,
+    event, 
+    createdAt: moment().valueOf()
+  };
+};
+
 var generateLocationMessage = (from, latitude, longitude) => {
   return {
     from,
@@ -16,4 +24,4 @@ var generateLocationMessage = (from, latitude, longitude) => {
   };
 };
 
-module.exports = {generateMessage, generateLocationMessage};
+module.exports = {generateMessage, generateLocationMessage, generateVideoPartyEvent};
