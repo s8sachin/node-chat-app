@@ -58,8 +58,8 @@ io.on('connection', (socket) => {
 
   socket.on('createVideoPartyEvent', (message, callback = defaultCb) =>{
     var user = users.getUser(socket.id);
-    console.log(message, 'MESSAGE')
     if (user && message){
+      console.log(user, message, 'MESSAGE')
       io.to(user.room).emit('newVideoPartyEvent', generateVideoPartyEvent(user.name, message));
     }
     callback();
@@ -74,7 +74,7 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     var user = users.removeUser(socket.id);
-
+    console.log('User left')
     if (user){
       io.to(user.room).emit('updateUserList', users.getUserList(user.room));
       io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`));
